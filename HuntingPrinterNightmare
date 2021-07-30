@@ -1,0 +1,11 @@
+let DriverLoads =
+DeviceImageLoadEvents
+| where InitiatingProcessFileName == "spoolsv.exe";
+let DistinctFiles =
+DriverLoads
+| distinct SHA1
+| invoke FileProfile();
+DriverLoads
+| join kind=inner DistinctFiles on SHA1
+| where SignatureState != "SignedValid"
+| where GlobalPrevalence < 40
